@@ -1,7 +1,7 @@
 const API_URL = 'https://api.teacherop.com/api'; // Change to your backend URL
 
 export const signup = async (email, password) => {
-  const response = await fetch(`${API_URL}/signup`, {
+  const response = await fetch(`${API_URL}/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ export const signup = async (email, password) => {
 };
 
 export const signupWithOAuth = async (idToken) => {
-  const response = await fetch(`${API_URL}/signup-oauth`, {
+  const response = await fetch(`${API_URL}/auth/signup-oauth`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ export const signupWithOAuth = async (idToken) => {
 };
 
 export const login = async (idToken) => {
-  const response = await fetch(`${API_URL}/login`, {
+  const response = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
