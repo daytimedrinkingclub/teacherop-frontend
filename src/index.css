@@ -1,0 +1,40 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+:root {
+  --primary-color: #1A1A1A; /* Dark Gray */
+  --secondary-color: #808080;
+  --secondary-color: #808080; /* Gray */
+  --accent-color: #333333; /* Dark Gray */
+  --background-color: #F2F2F2; /* Light Gray */
+  --text-color: #333333; /* Dark Gray */
+  --white-color: #FFFFFF; /* White */
+}
+
+body {
+  font-family: 'Fira Code', monospace;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.bg-accent-color {
+  background-color: var(--accent-color);
+}
+
+.text-white-color {
+  color: var(--white-color);
+}
+
+.bg-your-app-navbar-color {
+  background-color: var(--white-color);
+}
+
+.bg-your-app-button-color {
+  background-color: var(--accent-color);
+}
+
+.text-your-app-button-text-color {
+  color: var(--white-color);
+}

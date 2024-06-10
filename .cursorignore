@@ -1,0 +1,12 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+package-lock.json
+node_modules/
+*.svg
+*.json
+*.txt
+*.md
+src/logo.svg
+src/postcss.config.js
+src/setupTests.js
+public/
+README.md
