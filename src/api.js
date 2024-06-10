@@ -17,13 +17,13 @@ export const signup = async (email, password) => {
   return response.json();
 };
 
-export const signupWithOAuth = async (idToken) => {
+export const signupWithOAuth = async (idToken, provider) => {
   const response = await fetch(`${API_URL}/auth/signup-oauth`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ token: idToken }),
+    body: JSON.stringify({ token: idToken, provider }),
   });
 
   if (!response.ok) {

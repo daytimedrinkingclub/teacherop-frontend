@@ -26,11 +26,11 @@ const SignUpPage = () => {
     }
   };
 
-  const handleOAuthSignUp = async (provider) => {
+  const handleOAuthSignUp = async (provider, providerName) => {
     try {
       const result = await signInWithPopup(auth, provider);
       const idToken = await result.user.getIdToken();
-      const data = await signupWithOAuth(idToken);
+      const data = await signupWithOAuth(idToken, providerName);
       localStorage.setItem('token', data.token);
       navigate('/dashboard');
     } catch (error) {
@@ -39,8 +39,8 @@ const SignUpPage = () => {
     }
   };
 
-  const handleGoogleSignUp = () => handleOAuthSignUp(new GoogleAuthProvider());
-  const handleGitHubSignUp = () => handleOAuthSignUp(new GithubAuthProvider());
+  const handleGoogleSignUp = () => handleOAuthSignUp(new GoogleAuthProvider(), 'google');
+  const handleGitHubSignUp = () => handleOAuthSignUp(new GithubAuthProvider(), 'github');
 
   return (
     <div className="flex flex-col min-h-screen">
