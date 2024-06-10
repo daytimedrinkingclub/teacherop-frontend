@@ -1,4 +1,4 @@
-const API_URL = 'https://api.teacherop.com/api'; // Change to your backend URL
+const API_URL = 'https://api.teacherop.com/'; // Change to your backend URL
 
 export const signup = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/signup`, {
