@@ -70,35 +70,40 @@ export const login = async (idToken) => {
 };
 
 export const createCourse = async (query, onQuestionReceived, onSummaryReceived) => {
-  const response = await fetch(`${API_URL}/courses/create`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query }),
-  });
+  try {
+    const response = await fetch(`${API_URL}/courses/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Unknown error occurred');
+    }
+
+    const { socketUrl } = await response.json();
+    initializeSocket(socketUrl);
+
+    socket.on('questionReceived', (data) => {
+      onQuestionReceived(data);
+    });
+
+    socket.on('summaryReceived', (data) => {
+      onSummaryReceived(data);
+      disconnectSocket();
+    });
+
+    socket.on('error', (error) => {
+      console.error('Socket error:', error);
+      disconnectSocket();
+    });
+  } catch (error) {
+    console.error('Error creating course:', error.message);
+    throw error; // Rethrow or handle as needed
   }
-
-  const { socketUrl } = await response.json();
-  initializeSocket(socketUrl);
-
-  socket.on('questionReceived', (data) => {
-    onQuestionReceived(data);
-  });
-
-  socket.on('summaryReceived', (data) => {
-    onSummaryReceived(data);
-    disconnectSocket();
-  });
-
-  socket.on('error', (error) => {
-    console.error('Socket error:', error);
-    disconnectSocket();
-  });
 };
 
 export const answerQuestion = async (answer) => {
