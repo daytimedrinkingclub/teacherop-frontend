@@ -4,7 +4,8 @@ import { createCourse, answerQuestion } from '../../../api';
 
 const OnboardingForm = ({ query, onClose }) => {
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState([]); // Stores all answers
+  const [answer, setAnswer] = useState(''); // Current answer state
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const OnboardingForm = ({ query, onClose }) => {
 
   const handleAnswerSubmit = async (e) => {
     e.preventDefault();
-    const newAnswers = [...answers, { questionId: currentQuestion.id, answer }];
+    const newAnswers = [...answers, { questionId: currentQuestion.id, answer: answer }];
     setAnswers(newAnswers);
     await answerQuestion(answer); // Assuming this submits the answer to the backend
     setAnswer(''); // Reset answer for the next question
