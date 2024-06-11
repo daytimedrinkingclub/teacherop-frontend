@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createCourse, answerQuestion } from '../../../api';
 
-const OnboardingForm = ({ onClose }) => {
-  const location = useLocation();
-  const query = new URLSearchParams(location.search).get('query');
+const OnboardingForm = ({ query, onClose }) => {
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [answer, setAnswer] = useState('');
+  const [answers, setAnswers] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (query) {
+      handleCreateCourse();
+    }
+  }, [query]);
 
   const handleCreateCourse = async () => {
     const onQuestionReceived = (question) => {
@@ -15,6 +19,7 @@ const OnboardingForm = ({ onClose }) => {
     };
 
     const onSummaryReceived = (summary) => {
+      // Submit all answers here if needed or handle finalization
       navigate('/plan-summary', { state: { summary } });
       onClose();
     };
@@ -24,8 +29,11 @@ const OnboardingForm = ({ onClose }) => {
 
   const handleAnswerSubmit = async (e) => {
     e.preventDefault();
-    await answerQuestion(answer);
-    setAnswer('');
+    const newAnswers = [...answers, { questionId: currentQuestion.id, answer }];
+    setAnswers(newAnswers);
+    await answerQuestion(answer); // Assuming this submits the answer to the backend
+    setAnswer(''); // Reset answer for the next question
+    setCurrentQuestion(null); // Assuming the backend will push a new question or end the process
   };
 
   return (
@@ -122,15 +130,7 @@ const OnboardingForm = ({ onClose }) => {
         </form>
       ) : (
         <div>
-          <p className="text-lg font-semibold mb-4">
-            Hi! I'm here to help you create a personalized learning plan.
-          </p>
-          <button
-            onClick={handleCreateCourse}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-          >
-            Get Started
-          </button>
+          <p className="text-lg font-semibold mb-4">Please wait, processing your answers...</p>
         </div>
       )}
     </div>
