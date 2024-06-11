@@ -1,125 +1,138 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { createCourse, answerQuestion } from '../../../api';
 
 const OnboardingForm = ({ onClose }) => {
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('query');
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [answer, setAnswer] = useState('');
+  const navigate = useNavigate();
 
-  const questions = [
-    {
-      id: 1,
-      text: 'Why do you want to study?',
-      type: 'mcq',
-      options: [
-        'To improve my skills',
-        'To change my career',
-        'For personal growth',
-        'Other',
-      ],
-    },
-    {
-      id: 2,
-      text: 'How much do you already know about the subject?',
-      type: 'slider',
-      min: 0,
-      max: 10,
-    },
-    {
-      id: 3,
-      text: 'Please provide more details about your learning goals:',
-      type: 'text',
-    },
-  ];
+  const handleCreateCourse = async () => {
+    const onQuestionReceived = (question) => {
+      setCurrentQuestion(question);
+    };
 
-  const handleAnswerChange = (questionId, answer) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [questionId]: answer,
-    }));
+    const onSummaryReceived = (summary) => {
+      navigate('/plan-summary', { state: { summary } });
+      onClose();
+    };
+
+    await createCourse(query, onQuestionReceived, onSummaryReceived);
   };
 
-  const handleSubmit = async (e) => {
+  const handleAnswerSubmit = async (e) => {
     e.preventDefault();
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-    } else {
-      try {
-        const response = await fetch('/api/submit-answers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ query, answers }),
-        });
-
-        if (response.ok) {
-          onClose();
-        } else {
-          console.error('Failed to submit answers');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }
+    await answerQuestion(answer);
+    setAnswer('');
   };
-
-  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-      <form onSubmit={handleSubmit}>
-        <div className="mb-6">
-          <p className="text-lg font-semibold mb-2">{currentQuestion.text}</p>
-          {currentQuestion.type === 'mcq' && (
-            <div className="space-y-2">
-              {currentQuestion.options.map((option) => (
-                <label key={option} className="flex items-center">
-                  <input
-                    type="radio"
-                    name={currentQuestion.id}
-                    value={option}
-                    checked={answers[currentQuestion.id] === option}
-                    onChange={() => handleAnswerChange(currentQuestion.id, option)}
-                    className="mr-2"
-                  />
-                  <span>{option}</span>
-                </label>
-              ))}
-            </div>
-          )}
-          {currentQuestion.type === 'slider' && (
-            <div className="flex items-center">
+      {currentQuestion ? (
+        <form onSubmit={handleAnswerSubmit}>
+          <div className="mb-6">
+            <p className="text-lg font-semibold mb-2">{currentQuestion.question_text}</p>
+            {currentQuestion.answer_type === 'text' && (
+              <textarea
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2"
+                rows={4}
+              />
+            )}
+            {currentQuestion.answer_type === 'subjective' && (
+              <textarea
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2"
+                rows={4}
+              />
+            )}
+            {currentQuestion.answer_type === 'radio' && (
+              <div>
+                {currentQuestion.options.map((option, index) => (
+                  <div key={index}>
+                    <input
+                      type="radio"
+                      id={`radio-${index}`}
+                      name="radio-group"
+                      value={option}
+                      onChange={(e) => setAnswer(e.target.value)}
+                    />
+                    <label htmlFor={`radio-${index}`}>{option}</label>
+                  </div>
+                ))}
+              </div>
+            )}
+            {currentQuestion.answer_type === 'checkbox' && (
+              <div>
+                {currentQuestion.options.map((option, index) => (
+                  <div key={index}>
+                    <input
+                      type="checkbox"
+                      id={`checkbox-${index}`}
+                      value={option}
+                      onChange={(e) => {
+                        const newAnswer = [...answer];
+                        if (e.target.checked) {
+                          newAnswer.push(option);
+                        } else {
+                          const optionIndex = newAnswer.indexOf(option);
+                          if (optionIndex > -1) {
+                            newAnswer.splice(optionIndex, 1);
+                          }
+                        }
+                        setAnswer(newAnswer);
+                      }}
+                    />
+                    <label htmlFor={`checkbox-${index}`}>{option}</label>
+                  </div>
+                ))}
+              </div>
+            )}
+            {currentQuestion.answer_type === 'scale' && (
               <input
                 type="range"
-                min={currentQuestion.min}
-                max={currentQuestion.max}
-                value={answers[currentQuestion.id] || currentQuestion.min}
-                onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                min="1"
+                max="10"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
                 className="w-full"
               />
-              <span className="ml-2">{answers[currentQuestion.id] || currentQuestion.min}</span>
-            </div>
-          )}
-          {currentQuestion.type === 'text' && (
-            <textarea
-              value={answers[currentQuestion.id] || ''}
-              onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-              rows={4}
-            />
-          )}
-        </div>
-        <div className="flex justify-end">
+            )}
+            {currentQuestion.answer_type === 'datepicker' && (
+              <input
+                type="date"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2"
+              />
+            )}
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div>
+          <p className="text-lg font-semibold mb-4">
+            Hi! I'm here to help you create a personalized learning plan.
+          </p>
           <button
-            type="submit"
+            onClick={handleCreateCourse}
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
           >
-            {currentQuestionIndex === questions.length - 1 ? 'Submit' : 'Next'}
+            Get Started
           </button>
         </div>
-      </form>
+      )}
     </div>
   );
 };

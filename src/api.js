@@ -1,5 +1,17 @@
 const API_URL = 'https://api.teacherop.com'; // Change to your backend URL
 
+let socket;
+
+const initializeSocket = (socketUrl) => {
+  socket = io(socketUrl);
+};
+
+const disconnectSocket = () => {
+  if (socket) {
+    socket.disconnect();
+  }
+};
+
 export const signup = async (email, password) => {
   const response = await fetch(`${API_URL}/auth/signup`, {
     method: 'POST',
@@ -51,4 +63,40 @@ export const login = async (idToken) => {
   return response.json();
 };
 
+export const createCourse = async (query, onQuestionReceived, onSummaryReceived) => {
+  const response = await fetch(`${API_URL}/courses/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query }),
+  });
 
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error);
+  }
+
+  const { socketUrl } = await response.json();
+  initializeSocket(socketUrl);
+
+  socket.on('questionReceived', (data) => {
+    onQuestionReceived(data);
+  });
+
+  socket.on('summaryReceived', (data) => {
+    onSummaryReceived(data);
+    disconnectSocket();
+  });
+
+  socket.on('error', (error) => {
+    console.error('Socket error:', error);
+    disconnectSocket();
+  });
+};
+
+export const answerQuestion = async (answer) => {
+  if (socket) {
+    socket.emit('answerQuestion', { answer });
+  }
+};
