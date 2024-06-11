@@ -1,14 +1,20 @@
+import { io } from 'socket.io-client';
+
 const API_URL = 'https://api.teacherop.com'; // Change to your backend URL
 
 let socket;
 
-const initializeSocket = (socketUrl) => {
+const initializeSocket = (socketUrl = API_URL) => {
+  if (socket) {
+    socket.disconnect();
+  }
   socket = io(socketUrl);
 };
 
 const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
+    socket = null; // Clear the socket instance after disconnecting
   }
 };
 
