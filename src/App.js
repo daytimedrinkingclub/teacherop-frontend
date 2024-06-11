@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import io from 'socket.io-client';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard/Dashboard';
@@ -14,6 +15,9 @@ import StaticPage from './components/PolicyPages/StaticPage';
 import { useAuth } from './auth-provider';
 import './App.css';
 
+const socket = io('https://api.teacherop.com');
+
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -23,6 +27,21 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connected to socket server');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from socket server');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Layout />} />
