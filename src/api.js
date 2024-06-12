@@ -20,8 +20,10 @@ const disconnectSocket = () => {
   }
 };
 
-export const signupOrLogin = async (data) => {
-  const response = await fetch(`${API_URL}/auth/signup-login`, {
+export const signupOrLogin = async (data, action) => {
+  const url = action === 'signup' ? `${API_URL}/auth/signup` : `${API_URL}/auth/login`;
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -39,11 +41,13 @@ export const signupOrLogin = async (data) => {
 
 export const createCourse = async (query, onQuestionReceived, onSummaryReceived) => {
   try {
+    const token = localStorage.getItem('token');
+
     const response = await fetch(`${API_URL}/courses/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({ query }),
     });

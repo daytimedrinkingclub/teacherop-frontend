@@ -1,37 +1,33 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import googleIcon from '../assets/icons/googlecolor.svg';
-import githubIcon from '../assets/icons/githubcolor.svg';
-import { useAuth } from '../auth-provider';
+import { useAuth } from '../internal-auth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signup, login } = useAuth();
 
-  const handleOAuthLogin = async (provider) => {
+  const handleSignup = async (e) => {
+    e.preventDefault();
     try {
-      await login({ provider });
+      await signup(email, password);
       navigate('/dashboard');
     } catch (error) {
-      console.error('OAuth login error:', error);
-      setError('Failed to login with OAuth provider. Please try again.');
+      console.error('Signup error:', error);
+      setError('Failed to signup. Please try again.');
     }
   };
 
-  const handleGoogleLogin = () => handleOAuthLogin('google');
-  const handleGitHubLogin = () => handleOAuthLogin('github');
-
-  const handleEmailLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await login({ email, password });
+      await login(email, password);
       navigate('/dashboard');
     } catch (error) {
-      console.error('Email login error:', error);
-      setError('Failed to login with email. Please try again.');
+      console.error('Login error:', error);
+      setError('Failed to login. Please try again.');
     }
   };
 
@@ -43,22 +39,35 @@ const LoginPage = () => {
             TeacherOP
           </h1>
           {error && <div className="bg-red-200 text-red-800 px-4 py-2 rounded mb-4">{error}</div>}
-          <button
-            onClick={handleGoogleLogin}
-            className="bg-white text-gray-800 px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 w-full mb-4 flex items-center justify-center"
-          >
-            <img src={googleIcon} alt="Google" className="w-6 h-6 mr-2" />
-            Login with Google
-          </button>
-          <button
-            onClick={handleGitHubLogin}
-            className="bg-white text-gray-800 px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 w-full mb-6 flex items-center justify-center"
-          >
-            <img src={githubIcon} alt="GitHub" className="w-6 h-6 mr-2" />
-            Login with GitHub
-          </button>
-          <div className="text-center mb-6">OR</div>
-          <form onSubmit={handleEmailLogin}>
+          <form onSubmit={handleSignup}>
+            <div className="mb-4 relative">
+              <input
+                type="email"
+                placeholder="Email address"
+                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded focus:outline-none focus:border-accent"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-6 relative">
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded focus:outline-none focus:border-accent"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-accent text-white px-4 py-2 rounded hover:bg-primary-light w-full mb-4"
+            >
+              Signup
+            </button>
+          </form>
+          <form onSubmit={handleLogin}>
             <div className="mb-4 relative">
               <input
                 type="email"
@@ -83,7 +92,7 @@ const LoginPage = () => {
               type="submit"
               className="bg-accent text-white px-4 py-2 rounded hover:bg-primary-light w-full"
             >
-              Signup/Login
+              Login
             </button>
           </form>
           <div className="mt-4">
