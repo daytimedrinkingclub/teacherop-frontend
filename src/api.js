@@ -4,11 +4,13 @@ const API_URL = 'https://api.teacherop.com'; // Change to your backend URL
 
 let socket;
 
-const initializeSocket = (socketUrl = API_URL) => {
+const initializeSocket = (socketUrl, userId) => {
   if (socket) {
     socket.disconnect();
   }
-  socket = io(socketUrl);
+  socket = io(socketUrl, {
+    query: { userId },
+  });
 };
 
 const disconnectSocket = () => {
@@ -18,47 +20,13 @@ const disconnectSocket = () => {
   }
 };
 
-export const signup = async (email, password) => {
-  const response = await fetch(`${API_URL}/auth/signup`, {
+export const signupOrLogin = async (data) => {
+  const response = await fetch(`${API_URL}/auth/signup-login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error);
-  }
-
-  return response.json();
-};
-
-export const signupWithOAuth = async (idToken, provider) => {
-  const response = await fetch(`${API_URL}/auth/signup-oauth`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ token: idToken, provider }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error);
-  }
-
-  return response.json();
-};
-
-export const login = async (idToken) => {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ token: idToken }),
+    body: JSON.stringify(data),
   });
 
   if (!response.ok) {
@@ -75,6 +43,7 @@ export const createCourse = async (query, onQuestionReceived, onSummaryReceived)
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({ query }),
     });
@@ -84,8 +53,8 @@ export const createCourse = async (query, onQuestionReceived, onSummaryReceived)
       throw new Error(error.error || 'Unknown error occurred');
     }
 
-    const { socketUrl } = await response.json();
-    initializeSocket(socketUrl);
+    const { socketUrl, userId } = await response.json();
+    initializeSocket(socketUrl, userId);
 
     socket.on('questionReceived', (data) => {
       onQuestionReceived(data);

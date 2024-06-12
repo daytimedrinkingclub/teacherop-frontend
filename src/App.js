@@ -8,7 +8,6 @@ import Pricing from './components/Pricing/Pricing';
 import Assessment from './components/Assessment/Assessment';
 import Navbar from './components/Navbar/Navbar';
 import LoginPage from './components/LoginPage';
-import SignUpPage from './components/SignUpPage';
 import SupportPage from './components/PolicyPages/SupportPage';
 import StaticPage from './components/PolicyPages/StaticPage';
 import { useAuth } from './auth-provider';
@@ -30,7 +29,6 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />} />
       <Route path="/navbar" element={<Navbar />} />
-      <Route path="/signup" element={<SignUpPage />} />
       <Route path="/assessment" element={<Assessment />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/login" element={<LoginPage />} />
