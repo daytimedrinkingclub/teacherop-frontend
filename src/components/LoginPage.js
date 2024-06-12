@@ -8,6 +8,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
   const { signup, login } = useAuth();
 
@@ -24,29 +25,21 @@ const LoginPage = () => {
   const handleGoogleLogin = () => handleOAuthLogin('google');
   const handleGitHubLogin = () => handleOAuthLogin('github');
 
-  const handleSignup = async (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signup(email, password);
+      if (isSignup) {
+        await signup(email, password);
+      } else {
+        await login(email, password);
+      }
       navigate('/dashboard');
     } catch (error) {
-      console.error('Signup error:', error);
-      setError('Failed to signup. Please try again.');
+      console.error(`${isSignup ? 'Signup' : 'Login'} error:`, error);
+      setError(`Failed to ${isSignup ? 'signup' : 'login'}. Please try again.`);
     }
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      await login(email, password);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Login error:', error);
-      setError('Failed to login. Please try again.');
-    }
-  };
-
-  
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-1 flex items-center justify-center bg-background">
@@ -70,7 +63,7 @@ const LoginPage = () => {
             Login with GitHub
           </button>
           <div className="text-center mb-6">OR</div>
-          <form onSubmit={handleSignup}>
+          <form onSubmit={handleFormSubmit}>
             <div className="mb-4 relative">
               <input
                 type="email"
@@ -95,37 +88,17 @@ const LoginPage = () => {
               type="submit"
               className="bg-accent text-white px-4 py-2 rounded hover:bg-primary-light w-full mb-4"
             >
-              Signup
+              {isSignup ? 'Signup' : 'Login'}
             </button>
           </form>
-          <form onSubmit={handleLogin}>
-            <div className="mb-4 relative">
-              <input
-                type="email"
-                placeholder="Email address"
-                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded focus:outline-none focus:border-accent"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-6 relative">
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded focus:outline-none focus:border-accent"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+          <div className="text-center">
             <button
-              type="submit"
-              className="bg-accent text-white px-4 py-2 rounded hover:bg-primary-light w-full"
+              onClick={() => setIsSignup(!isSignup)}
+              className="text-accent hover:underline"
             >
-              Login
+              {isSignup ? 'Already have an account? Login' : 'Don\'t have an account? Signup'}
             </button>
-          </form>
+          </div>
           <div className="mt-4">
             <a href="/forgot-password" className="text-accent hover:underline">
               Forgot password?
