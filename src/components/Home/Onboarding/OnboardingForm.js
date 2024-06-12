@@ -1,41 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createCourse, answerQuestion } from '../../../api';
+import { answerQuestion } from '../../../api';
+import io from 'socket.io-client';
 
 const OnboardingForm = ({ query, onClose }) => {
+  const [socket, setSocket] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [answers, setAnswers] = useState([]); // Stores all answers
-  const [answer, setAnswer] = useState(''); // Current answer state
+  const [answers, setAnswers] = useState([]);
+  const [answer, setAnswer] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (query) {
-      handleCreateCourse();
-    }
-  }, [query]);
+    const newSocket = io(); // Connect to the server using Socket.IO
+    setSocket(newSocket);
 
-  const handleCreateCourse = async () => {
-    const onQuestionReceived = (question) => {
+    newSocket.on('questionReceived', (question) => {
       setCurrentQuestion(question);
-    };
+    });
 
-    const onSummaryReceived = (summary) => {
-      // Submit all answers here if needed or handle finalization
+    newSocket.on('summaryReceived', (summary) => {
       navigate('/plan-summary', { state: { summary } });
       onClose();
-    };
+    });
 
-    await createCourse(query, onQuestionReceived, onSummaryReceived);
-  };
+    newSocket.on('error', (error) => {
+      console.error('Socket error:', error);
+    });
+
+    return () => {
+      newSocket.disconnect(); // Disconnect the socket when the component unmounts
+    };
+  }, []);
 
   const handleAnswerSubmit = async (e) => {
     e.preventDefault();
     const newAnswers = [...answers, { questionId: currentQuestion.id, answer: answer }];
     setAnswers(newAnswers);
-    await answerQuestion(answer); // Assuming this submits the answer to the backend
-    setAnswer(''); // Reset answer for the next question
-    setCurrentQuestion(null); // Assuming the backend will push a new question or end the process
+    socket.emit('answerQuestion', { answer }); // Emit the answer to the server
+    setAnswer('');
+    setCurrentQuestion(null);
   };
+
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">

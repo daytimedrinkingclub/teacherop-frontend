@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
 import OnboardingForm from './Onboarding/OnboardingForm';
+import { createCourse } from '../../api'; // Import the createCourse function
 
 const placeholders = [
   'What do you want to learn today?',
@@ -52,10 +53,19 @@ const HeroSection = () => {
     return () => clearInterval(typingInterval);
   }, [placeholderIndex, isFocused]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (query.trim() !== '') {
-      setIsModalOpen(true);
+      try {
+        const response = await createCourse(query);
+        if (response.status === 200) {
+          setIsModalOpen(true);
+        } else {
+          console.error('Failed to create course');
+        }
+      } catch (error) {
+        console.error('Error creating course:', error);
+      }
     }
   };
 
