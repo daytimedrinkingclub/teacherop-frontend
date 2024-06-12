@@ -10,3 +10,8 @@ src/postcss.config.js
 src/setupTests.js
 public/
 README.md
+postcss.config.js
+tailwind.config.js
+src/setupTests.js
+src/reportWebVitals.js
+public/

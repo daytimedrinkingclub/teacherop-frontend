@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import googleIcon from '../assets/icons/googlecolor.svg';
 import githubIcon from '../assets/icons/githubcolor.svg';
-import { useAuth } from '../internalAuth';
+import { useAuth } from '../internalAuth'; // This import is correct as per the provided context from internalAuth.js
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -10,11 +10,11 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
   const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
-  const { signup, login } = useAuth();
+  const [ signup, login, oauthLogin ] = useAuth(); // These function names are correctly imported from useAuth as per internalAuth.js
 
   const handleOAuthLogin = async (provider) => {
     try {
-      await login({ provider });
+      await oauthLogin(provider);
       navigate('/dashboard');
     } catch (error) {
       console.error('OAuth login error:', error);
