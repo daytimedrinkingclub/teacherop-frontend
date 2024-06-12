@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../../Internal-Auth';
+import { useAuth } from '../../internalAuth';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {

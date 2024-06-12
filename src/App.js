@@ -10,7 +10,7 @@ import Navbar from './components/Navbar/Navbar';
 import LoginPage from './components/LoginPage';
 import SupportPage from './components/PolicyPages/SupportPage';
 import StaticPage from './components/PolicyPages/StaticPage';
-import { useAuth } from './Internal-Auth';
+import { useAuth } from './internalAuth';
 import './App.css';
 
 

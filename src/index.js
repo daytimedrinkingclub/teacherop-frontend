@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
-import { InternalAuthProvider } from './Internal-Auth';
+import { InternalAuthProvider } from './internalAuth';
 
 const root = createRoot(document.getElementById('root'));
 
