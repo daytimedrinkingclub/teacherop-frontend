@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
-import { login } from './api';
+import { signupOrLogin } from './api';
 
 const AuthContext = createContext();
 
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const idToken = await user.getIdToken();
-        const { token } = await login(idToken);
+        const { token } = await signupOrLogin(idToken);
         localStorage.setItem('token', token);
         setUser(user);
       } else {
