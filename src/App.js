@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import {auth, app, analytics } from './firebase';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard/Dashboard';
 import AccountLayout from './components/Dashboard/Account/AccountLayout';
@@ -11,7 +10,7 @@ import Navbar from './components/Navbar/Navbar';
 import LoginPage from './components/LoginPage';
 import SupportPage from './components/PolicyPages/SupportPage';
 import StaticPage from './components/PolicyPages/StaticPage';
-import { useAuth } from './internal-auth';
+import { useAuth } from './Internal-Auth';
 import './App.css';
 
 

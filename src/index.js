@@ -3,16 +3,16 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
-import { AuthProvider } from './internal-auth';
+import { InternalAuthProvider } from './Internal-Auth';
 
 const root = createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
+      <InternalAuthProvider>
         <App />
-      </AuthProvider>
+      </InternalAuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

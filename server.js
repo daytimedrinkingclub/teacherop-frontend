@@ -13,5 +13,5 @@ app.get('*', (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`React app server is running on port ${port}`);
+  console.log(`React app is running on port ${port}`);
 });
