@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from './firebase';
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, googleProvider, githubProvider } from './firebase';
 import { signupOrLogin } from './api';
 
 const AuthContext = createContext();
@@ -55,6 +55,28 @@ export const InternalAuthProvider = ({ children }) => {
     }
   };
 
+  const oauthLogin = async (provider) => {
+    try {
+      let userCredential;
+      if (provider === 'google') {
+        userCredential = await signInWithPopup(auth, googleProvider);
+      } else if (provider === 'github') {
+        userCredential = await signInWithPopup(auth, githubProvider);
+      } else {
+        throw new Error('Invalid OAuth provider');
+      }
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+      const response = await signupOrLogin({ token }, 'login');
+      localStorage.setItem('token', response.token);
+      setUser(user);
+    } catch (error) {
+      console.error('OAuth login error:', error);
+      throw error;
+    }
+  };
+
+
   const logout = async () => {
     try {
       await auth.signOut();
@@ -66,7 +88,8 @@ export const InternalAuthProvider = ({ children }) => {
     }
   };
 
-  const value = { user, loading, signup, login, logout };
+  const value = { user, loading, signup, login, oauthLogin, logout };
+
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
