@@ -67,7 +67,11 @@ export const InternalAuthProvider = ({ children }) => {
       }
       const user = userCredential.user;
       const token = await user.getIdToken();
-      const response = await signupOrLogin({ token }, 'login');
+      const isNewUser = userCredential.additionalUserInfo.isNewUser;
+  
+      const action = isNewUser ? 'signup' : 'login';
+      const response = await signupOrLogin({ token }, action);
+  
       localStorage.setItem('token', response.token);
       setUser(user);
     } catch (error) {
