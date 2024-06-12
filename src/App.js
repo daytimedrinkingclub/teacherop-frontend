@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
+import { app, analytics } from './firebase';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard/Dashboard';
 import AccountLayout from './components/Dashboard/Account/AccountLayout';

@@ -1,49 +1,34 @@
-// src/pages/LoginPage.js
 import React, { useState } from 'react';
-import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import googleIcon from '../assets/icons/googlecolor.svg';
 import githubIcon from '../assets/icons/githubcolor.svg';
-import { signupOrLogin } from '../api';
+import { useAuth } from '../auth-provider';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  const handleSignupOrLogin = async (data) => {
-    try {
-      const response = await signupOrLogin(data);
-      localStorage.setItem('token', response.token);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Signup/Login error:', error);
-      setError('Failed to signup/login. Please try again.');
-    }
-  };
+  const { signupOrLogin } = useAuth();
 
   const handleOAuthSignupOrLogin = async (provider) => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken();
-      await handleSignupOrLogin({ idToken, provider });
+      await signupOrLogin({ provider });
+      navigate('/dashboard');
     } catch (error) {
       console.error('OAuth signup/login error:', error);
       setError('Failed to signup/login with OAuth provider. Please try again.');
     }
   };
 
-  const handleGoogleSignupOrLogin = () => handleOAuthSignupOrLogin(new GoogleAuthProvider());
-  const handleGitHubSignupOrLogin = () => handleOAuthSignupOrLogin(new GithubAuthProvider());
+  const handleGoogleSignupOrLogin = () => handleOAuthSignupOrLogin('google');
+  const handleGitHubSignupOrLogin = () => handleOAuthSignupOrLogin('github');
 
   const handleEmailSignupOrLogin = async (e) => {
     e.preventDefault();
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      const idToken = await result.user.getIdToken();
-      await handleSignupOrLogin({ idToken, email, password });
+      await signupOrLogin({ email, password });
+      navigate('/dashboard');
     } catch (error) {
       console.error('Email signup/login error:', error);
       setError('Failed to signup/login with email. Please try again.');
