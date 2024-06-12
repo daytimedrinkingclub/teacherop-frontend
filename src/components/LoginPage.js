@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import googleIcon from '../assets/icons/googlecolor.svg';
+import githubIcon from '../assets/icons/githubcolor.svg';
 import { useAuth } from '../internalAuth';
 
 const LoginPage = () => {
@@ -8,6 +10,19 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { signup, login } = useAuth();
+
+  const handleOAuthLogin = async (provider) => {
+    try {
+      await login({ provider });
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('OAuth login error:', error);
+      setError('Failed to login with OAuth provider. Please try again.');
+    }
+  };
+
+  const handleGoogleLogin = () => handleOAuthLogin('google');
+  const handleGitHubLogin = () => handleOAuthLogin('github');
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -39,6 +54,21 @@ const LoginPage = () => {
             TeacherOP
           </h1>
           {error && <div className="bg-red-200 text-red-800 px-4 py-2 rounded mb-4">{error}</div>}
+          <button
+            onClick={handleGoogleLogin}
+            className="bg-white text-gray-800 px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 w-full mb-4 flex items-center justify-center"
+          >
+            <img src={googleIcon} alt="Google" className="w-6 h-6 mr-2" />
+            Login with Google
+          </button>
+          <button
+            onClick={handleGitHubLogin}
+            className="bg-white text-gray-800 px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 w-full mb-6 flex items-center justify-center"
+          >
+            <img src={githubIcon} alt="GitHub" className="w-6 h-6 mr-2" />
+            Login with GitHub
+          </button>
+          <div className="text-center mb-6">OR</div>
           <form onSubmit={handleSignup}>
             <div className="mb-4 relative">
               <input
