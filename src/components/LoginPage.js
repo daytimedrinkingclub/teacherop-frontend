@@ -9,29 +9,29 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { signupOrLogin } = useAuth();
+  const { login } = useAuth();
 
-  const handleOAuthSignupOrLogin = async (provider) => {
+  const handleOAuthLogin = async (provider) => {
     try {
-      await signupOrLogin({ provider });
+      await login({ provider });
       navigate('/dashboard');
     } catch (error) {
-      console.error('OAuth signup/login error:', error);
-      setError('Failed to signup/login with OAuth provider. Please try again.');
+      console.error('OAuth login error:', error);
+      setError('Failed to login with OAuth provider. Please try again.');
     }
   };
 
-  const handleGoogleSignupOrLogin = () => handleOAuthSignupOrLogin('google');
-  const handleGitHubSignupOrLogin = () => handleOAuthSignupOrLogin('github');
+  const handleGoogleLogin = () => handleOAuthLogin('google');
+  const handleGitHubLogin = () => handleOAuthLogin('github');
 
-  const handleEmailSignupOrLogin = async (e) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault();
     try {
-      await signupOrLogin({ email, password });
+      await login({ email, password });
       navigate('/dashboard');
     } catch (error) {
-      console.error('Email signup/login error:', error);
-      setError('Failed to signup/login with email. Please try again.');
+      console.error('Email login error:', error);
+      setError('Failed to login with email. Please try again.');
     }
   };
 
@@ -44,21 +44,21 @@ const LoginPage = () => {
           </h1>
           {error && <div className="bg-red-200 text-red-800 px-4 py-2 rounded mb-4">{error}</div>}
           <button
-            onClick={handleGoogleSignupOrLogin}
+            onClick={handleGoogleLogin}
             className="bg-white text-gray-800 px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 w-full mb-4 flex items-center justify-center"
           >
             <img src={googleIcon} alt="Google" className="w-6 h-6 mr-2" />
-            Signup/Login with Google
+            Login with Google
           </button>
           <button
-            onClick={handleGitHubSignupOrLogin}
+            onClick={handleGitHubLogin}
             className="bg-white text-gray-800 px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 w-full mb-6 flex items-center justify-center"
           >
             <img src={githubIcon} alt="GitHub" className="w-6 h-6 mr-2" />
-            Signup/Login with GitHub
+            Login with GitHub
           </button>
           <div className="text-center mb-6">OR</div>
-          <form onSubmit={handleEmailSignupOrLogin}>
+          <form onSubmit={handleEmailLogin}>
             <div className="mb-4 relative">
               <input
                 type="email"
