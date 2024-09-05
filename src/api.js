@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 
-const API_URL = 'https://api.teacherop.com'; // Change to your backend URL
+const API_URL = 'https://teacherop.com'; // Change to your backend URL
+// const API_URL = 'http://127.0.0.1:8000'; // Change to your backend URL
 
 let socket;
 
